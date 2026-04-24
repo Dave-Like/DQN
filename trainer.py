@@ -1,51 +1,46 @@
 import numpy as np
-from plot_utils import plot_rewards  
+from plot_utils import plot_rewards
 
-def train_agent(
-    env,
-    agent,
-    num_episodes=1100,
-    log_freq=20,
-    algo_name="DQN",
-    env_name="highway-v0",
-    render=False  
-):
+def train_agent(env, agent, num_episodes, log_freq, algo_name, env_name):
     reward_history = []
-    
-    for episode in range(num_episodes):
-        # 重置环境
-        state, _ = env.reset()
-        episode_reward = 0
-        done, truncated = False, False
+    total_episodes = 0
+    episode_rewards = np.zeros(env.num_envs, dtype=np.float32)
 
-        while not (done or truncated):
-            if render:
-                env.render()
-            # 选动作
-            action = agent.select_action(state)
-            # 执行动作
-            next_state, reward, done, truncated, _ = env.step(action)
-            # 存储经验
-            agent.store_transition(state, action, reward, next_state, done)
-            # 训练
-            agent.train_step()
+    states, _ = env.reset()
+    while total_episodes < num_episodes:
+        actions = agent.select_action(states)
+        next_states, rewards, terminated, truncated, _ = env.step(actions)
+        dones = np.logical_or(terminated, truncated)
 
-            # 更新状态
-            state = next_state
-            episode_reward += reward
+        agent.store_batch_transitions(states, actions, rewards, next_states, dones)
+        agent.maybe_update()
 
-        # 探索策略衰减
-        agent.decay_exploration()
+        episode_rewards += np.array(rewards, dtype=np.float32)
 
-        if episode % agent.target_update_freq == 0:
-            agent.update_target_network()
-        
-        reward_history.append(episode_reward)
-        
-        if episode % log_freq == 0:
-            print(f"Episode: {episode:3d} | Reward: {episode_reward:6.1f} ")
+        for idx, done in enumerate(dones):
+            if done:
+                reward_history.append(float(episode_rewards[idx]))
+                episode_rewards[idx] = 0.0
+                total_episodes += 1
+                agent.decay_exploration()
+                if total_episodes >= num_episodes:
+                    break
 
-    env.close()
-    plot_rewards(reward_history, algo_name, env_name)  
+        if total_episodes >= num_episodes:
+            break
+
+        states = next_states
+
+        if len(reward_history) and total_episodes % log_freq == 0 and total_episodes == len(reward_history):
+            print(f"Episode: {total_episodes} | Avg Reward: {np.mean(reward_history[-log_freq:]):.1f}")
+
+    plot_rewards(
+        rewards=reward_history,
+        algo_name=algo_name,
+        env_name=env_name,
+        window=100,
+        save_path=f"{algo_name}_{env_name}_rewards.png",
+        show_plot=True
+    )
 
     return reward_history
