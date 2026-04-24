@@ -6,6 +6,7 @@ from gymnasium.wrappers import FlattenObservation
 from gymnasium.vector import AsyncVectorEnv
 from DQNAgent import DQNAgent
 from trainer import train_agent
+from DuelingDQNAgent import DuelingDQNAgent
 
 NUM_ENVS = min(8, max(1, (os.cpu_count() or 2) // 2))
 
@@ -39,7 +40,7 @@ def main():
 
     state_dim = env.single_observation_space.shape[0]
     action_dim = env.single_action_space.n
-    agent = DQNAgent(
+    agent = DuelingDQNAgent(
         state_dim=state_dim,
         action_dim=action_dim,
         hidden_dim=256,
@@ -65,9 +66,9 @@ def main():
     reward_history = train_agent(
         env=env,
         agent=agent,
-        num_episodes=5000,
+        num_episodes=3000,
         log_freq=50,
-        algo_name="DQN",
+        algo_name="DuelingDQN",
         env_name="highway-v0",
     )
     env.close()
