@@ -10,7 +10,7 @@ def plot_rewards(
     show_plot=True
 ):
     if not isinstance(rewards, (list, np.ndarray)) or len(rewards) == 0:
-        print("BBQ了，图画不了了")
+        print("BBQ了")
         return
 
     smoothed_rewards = []
@@ -23,10 +23,10 @@ def plot_rewards(
     plt.rcParams['axes.unicode_minus'] = False   
     plt.figure(figsize=(10, 6))
 
-    plt.plot(rewards, label="原始奖励", alpha=0.4, color="#1f77b4")
+    plt.plot(rewards, label="单回合回报", alpha=0.4, color="#1f77b4")
     plt.plot(smoothed_rewards, label=f"滑动平均（窗口={window}）", color="#ff4b5c")
     plt.xlabel("训练回合 (Episode)", fontsize=12)
-    plt.ylabel("累计奖励 (Cumulative Reward)", fontsize=12)
+    plt.ylabel("单回合回报 (Episode Reward)", fontsize=12)
     plt.title(f"{algo_name} 算法在 {env_name} 环境的训练曲线", fontsize=14)
     plt.legend(fontsize=10)
     plt.grid(True, alpha=0.3)
