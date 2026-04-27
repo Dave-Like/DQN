@@ -16,7 +16,7 @@ class Exploration:
 
 
 class EpsilonGreedy:
-    def __init__(self, action_dim, device, init_eps=0.9, min_eps=0.01, decay_rate=0.995):
+    def __init__(self, action_dim, device, init_eps=0.9, min_eps=0.02, decay_rate=0.999):
         self.action_dim = action_dim
         self.device = device
         self.eps = init_eps
