@@ -43,9 +43,9 @@ def train_agent(env, agent, num_episodes, log_freq, algo_name, env_name, explora
             explorer = getattr(agent, "explorer", None)
             epsilon = getattr(explorer, "eps", None)
             if epsilon is not None:
-                print(f"Episode: {total_episodes} | Avg Reward: {np.mean(reward_history[-log_freq:]):.1f} | Epsilon: {epsilon:.3f}")
+                print(f"Episode: {total_episodes} | Episode Reward Average: {np.mean(reward_history[-log_freq:]):.1f} | Epsilon: {epsilon:.3f}")
             else:
-                print(f"Episode: {total_episodes} | Avg Reward: {np.mean(reward_history[-log_freq:]):.1f}")
+                print(f"Episode: {total_episodes} | Episode Reward Average: {np.mean(reward_history[-log_freq:]):.1f}")
 
     plot_rewards(
         rewards=reward_history,
